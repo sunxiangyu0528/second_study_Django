@@ -17,8 +17,13 @@ class Projects(models.Model):
     class Meta(object):
         db_table = 'tb_projects'
         # 在admin站点中，显示一个更人性化的表名
-        verbose_name = '项目111' # 增加项目的描述
+        verbose_name = '项目111'  # 增加项目的描述
         verbose_name_plural = '项目(admin站点描述)'
 
     def __str__(self):
         return self.name
+
+
+# class Interfaces(models.Model):
+#     project = models.ForeignKey('Projects', on_delete=models.CASCADE, verbose_name="所属项目", help_text='所属项目')
+#
