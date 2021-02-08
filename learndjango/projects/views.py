@@ -24,7 +24,8 @@ class IndexView(View):
         # one = Projects.objects.filter(id=1)
         # qs = Projects.objects.filter(interfaces__name='这是一个接口项目')
         # 外键字段__从表的字段名
-        Projects.objects.filter(interface__name='这是一个接口项目')
+        one = Projects.objects.filter(interface__name='这是一个接口项目')
+
         # Projects.objects.filter()
         # pass
         return JsonResponse({'hello': 'world'})
