@@ -63,7 +63,7 @@ null:设置数据库此字段可以为空
 
 
 创建后台站点信息
-admin.register()
+admin.site.register(Projects)
 
 
 创建超级管理员
