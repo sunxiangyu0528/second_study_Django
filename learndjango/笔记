@@ -62,6 +62,15 @@ blank：设置前端可以不传递
 null:设置数据库此字段可以为空
 
 
+单字段校验
+    def validate_name(self, value):
+多字段校验
+    def validate(self, attrs):
+
+
+
+
+
 创建后台站点信息
 admin.site.register(Projects)
 
