@@ -79,7 +79,22 @@ apiview不仅可以传json格式的数据，也可以传form表单格式的，�
 1。settings里设置
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 3,  # 每页数目
-2。
+
+django：
+view
+
+DRF:
+APIView
+GenericAPIView
+mixins拓展类
+CreateAPIView
+ViewSet视图集
+GenericViewSet
+CreateViewSet
+
+
+
+
 
 创建后台站点信息
 admin.site.register(Projects)
