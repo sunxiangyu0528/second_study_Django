@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.viewsets import ModelViewSet
+from rest_framework import permissions
 
 from projects.models import Projects
 from projects.serializer import ProjectModelSerializer, \
@@ -27,7 +28,7 @@ class ProjectsViewSet(viewsets.ModelViewSet):
     """
     queryset = Projects.objects.all()
     serializer_class = ProjectModelSerializer
-
+    permission_classes = [permissions.IsAuthenticated]
     # ordering_fields = ['name', 'leader']
     # filterset_fields = ['name', 'leader']
     # action装饰器来声明自定义的动作

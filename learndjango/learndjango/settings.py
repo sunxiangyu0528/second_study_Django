@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'projects.apps.ProjectsConfig',
     'interfaces.apps.InterfacesConfig',
+    'user.apps.UserConfig',
     'rest_framework',
     'django_filters',
     'drf_yasg',
@@ -158,85 +159,59 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'utils.pagination.PageNumberPaginationManual',
 
     'PAGE_SIZE': 3,  # 每页数目,
-    "DEFAULT_SCHEMA_CLASS": 'rest_framework.schemas.coreapi.AutoSchema'
-
+    "DEFAULT_SCHEMA_CLASS": 'rest_framework.schemas.coreapi.AutoSchema',
+    "DEFAULT_PERMISSION_CLASSES": "rest_framework.permissions.IsAuthenticated",
 }
 ALLOWED_HOSTS = ["*"]
 
-BASE_LOG_DIR = os.path.join(BASE_DIR, "log")
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
+    'version': 1,  # 保留字
+    'disable_existing_loggers': False,  # 禁用已经存在的logger实例
+    # 日志文件的格式
     'formatters': {
-        'standard': {
+        # 详细的日志格式
+        'verbose': {
             'format': '[%(asctime)s][%(threadName)s:%(thread)d][task_id:%(name)s][%(filename)s:%(lineno)d]'
                       '[%(levelname)s][%(message)s]'
         },
+        # 简单的日志格式
         'simple': {
             'format': '[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d]%(message)s'
-        },
-        'collect': {
-            'format': '%(message)s'
         }
     },
+    # 过滤器
     'filters': {
         'require_debug_true': {
             '()': 'django.utils.log.RequireDebugTrue',
         },
     },
+    # 处理器
     'handlers': {
+        # 在终端打印
         'console': {
             'level': 'DEBUG',
             'filters': ['require_debug_true'],  # 只有在Django debug为True时才在屏幕打印日志
-            'class': 'logging.StreamHandler',
+            'class': 'logging.StreamHandler',  #
             'formatter': 'simple'
         },
-        'SF': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，根据文件大小自动切
-            'filename': os.path.join(BASE_LOG_DIR, "xxx_info.log"),  # 日志文件
-            'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
-            'backupCount': 3,  # 备份数为3  xx.log --> xx.log.1 --> xx.log.2 --> xx.log.3
-            'formatter': 'standard',
-            'encoding': 'utf-8',
-        },
-        'TF': {
-            'level': 'INFO',
-            'class': 'logging.handlers.TimedRotatingFileHandler',  # 保存到文件，根据时间自动切
-            'filename': os.path.join(BASE_LOG_DIR, "xxx_info.log"),  # 日志文件
-            'backupCount': 3,  # 备份数为3  xx.log --> xx.log.2018-08-23_00-00-00 --> xx.log.2018-08-24_00-00-00 --> ...
-            'when': 'D',  # 每天一切， 可选值有S/秒 M/分 H/小时 D/天 W0-W6/周(0=周一) midnight/如果没指定时间就默认在午夜
-            'formatter': 'standard',
-            'encoding': 'utf-8',
-        },
-        'error': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
-            'filename': os.path.join(BASE_LOG_DIR, "xxx_err.log"),  # 日志文件
-            'maxBytes': 1024 * 1024 * 5,  # 日志大小 50M
-            'backupCount': 5,
-            'formatter': 'standard',
-            'encoding': 'utf-8',
-        },
-        'collect': {
+        # 默认的
+        'file': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
-            'filename': os.path.join(BASE_LOG_DIR, "xxx_collect.log"),
-            'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
-            'backupCount': 5,
-            'formatter': 'collect',
-            'encoding': "utf-8"
+            'filename': os.path.join(BASE_DIR, "logs/mytest.log"),  # 日志文件
+            'maxBytes': 1024 * 1024 * 500,  # 日志大小 50M
+            'backupCount': 10,  # 最多备份几个
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
         }
     },
     'loggers': {
-        '': {  # 默认的logger应用如下配置
-            'handlers': ['SF', 'console', 'error'],  # 上线之后可以把'console'移除
+        # 默认的logger应用如下配置
+        'mytest': {
+            'handlers': ['file', 'console'],  # 上线之后可以把'console'移除
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': True,  # 向不向更高级别的logger传递
         },
-        'collect': {  # 名为 'collect'的logger还单独处理
-            'handlers': ['console', 'collect'],
-            'level': 'INFO',
-        }
+
     },
 }
