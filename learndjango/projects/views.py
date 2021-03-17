@@ -29,6 +29,8 @@ class ProjectsViewSet(viewsets.ModelViewSet):
     queryset = Projects.objects.all()
     serializer_class = ProjectModelSerializer
     permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.AllowAny]
+
     # ordering_fields = ['name', 'leader']
     # filterset_fields = ['name', 'leader']
     # action装饰器来声明自定义的动作

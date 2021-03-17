@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '@=qn*7qyve98$=)6csvv3(ex8%@=2hz2r4ik6nww))l$v#ny*l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -44,16 +44,11 @@ INSTALLED_APPS = [
     'drf_yasg',
 ]
 
-JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=600),  # 修改token认证时间
-    'JWT_AUTH_HEADER_PREFIX': 'BF',
-    'JWT_RESPONSE_PAYLOAD_HANDLER': 'utils.jwt_handle.jwt_response_payload_handler'
-}
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # 跨域设置
     # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -158,7 +153,10 @@ REST_FRAMEWORK = {
 
     'PAGE_SIZE': 3,  # 每页数目,
     "DEFAULT_SCHEMA_CLASS": 'rest_framework.schemas.coreapi.AutoSchema',
-    "DEFAULT_PERMISSION_CLASSES": "rest_framework.permissions.IsAuthenticated",
+    # "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated",],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
+    # "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAdminUser",],
+
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',  # 第一种jwt方式
         'rest_framework.authentication.BasicAuthentication',  # 基本认证
@@ -167,56 +165,82 @@ REST_FRAMEWORK = {
 }
 ALLOWED_HOSTS = ["*"]
 
+BASE_LOG_DIR = os.path.join(BASE_DIR, "logs")
 LOGGING = {
-    'version': 1,  # 保留字
-    'disable_existing_loggers': False,  # 禁用已经存在的logger实例
-    # 日志文件的格式
+    'version': 1,
+    'disable_existing_loggers': False,
     'formatters': {
-        # 详细的日志格式
-        'verbose': {
+        'standard': {
             'format': '[%(asctime)s][%(threadName)s:%(thread)d][task_id:%(name)s][%(filename)s:%(lineno)d]'
                       '[%(levelname)s][%(message)s]'
         },
-        # 简单的日志格式
         'simple': {
             'format': '[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d]%(message)s'
+        },
+        'collect': {
+            'format': '%(message)s'
         }
     },
-    # 过滤器
     'filters': {
         'require_debug_true': {
             '()': 'django.utils.log.RequireDebugTrue',
         },
     },
-    # 处理器
     'handlers': {
-        # 在终端打印
         'console': {
             'level': 'DEBUG',
             'filters': ['require_debug_true'],  # 只有在Django debug为True时才在屏幕打印日志
-            'class': 'logging.StreamHandler',  #
+            'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
-        # 默认的
-        'file': {
+        'SF': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，根据文件大小自动切
+            'filename': os.path.join(BASE_LOG_DIR, "xxx_info.log"),  # 日志文件
+            'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
+            'backupCount': 3,  # 备份数为3  xx.log --> xx.log.1 --> xx.log.2 --> xx.log.3
+            'formatter': 'standard',
+            'encoding': 'utf-8',
+        },
+        'TF': {
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',  # 保存到文件，根据时间自动切
+            'filename': os.path.join(BASE_LOG_DIR, "xxx_info.log"),  # 日志文件
+            'backupCount': 3,  # 备份数为3  xx.log --> xx.log.2018-08-23_00-00-00 --> xx.log.2018-08-24_00-00-00 --> ...
+            'when': 'D',  # 每天一切， 可选值有S/秒 M/分 H/小时 D/天 W0-W6/周(0=周一) midnight/如果没指定时间就默认在午夜
+            'formatter': 'standard',
+            'encoding': 'utf-8',
+        },
+        'error': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
+            'filename': os.path.join(BASE_LOG_DIR, "xxx_err.log"),  # 日志文件
+            'maxBytes': 1024 * 1024 * 5,  # 日志大小 50M
+            'backupCount': 5,
+            'formatter': 'standard',
+            'encoding': 'utf-8',
+        },
+        'collect': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
-            'filename': os.path.join(BASE_DIR, "logs/mytest.log"),  # 日志文件
-            'maxBytes': 1024 * 1024 * 500,  # 日志大小 50M
-            'backupCount': 10,  # 最多备份几个
-            'formatter': 'verbose',
-            'encoding': 'utf-8',
+            'filename': os.path.join(BASE_LOG_DIR, "xxx_collect.log"),
+            'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
+            'backupCount': 5,
+            'formatter': 'collect',
+            'encoding': "utf-8"
         }
     },
     'loggers': {
-        # 默认的logger应用如下配置
-        'mytest': {
-            'handlers': ['file', 'console'],  # 上线之后可以把'console'移除
+        '': {  # 默认的logger应用如下配置
+            'handlers': ['SF', 'console', 'error'],  # 上线之后可以把'console'移除
             'level': 'DEBUG',
-            'propagate': True,  # 向不向更高级别的logger传递
+            'propagate': True,
         },
-
+        'collect': {  # 名为 'collect'的logger还单独处理
+            'handlers': ['console', 'collect'],
+            'level': 'INFO',
+        }
     },
 }
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'front_ends/static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'front_ends/static')
