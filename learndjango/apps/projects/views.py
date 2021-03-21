@@ -15,6 +15,7 @@ class ProjectsViewSet(viewsets.ModelViewSet):
     """
     queryset = Projects.objects.all()
     serializer_class = ProjectModelSerializer
+
     # permission_classes = [permissions.IsAuthenticated]
     # permission_classes = [permissions.AllowAny]
 
