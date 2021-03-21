@@ -259,4 +259,4 @@ LOGGING = {
     },
 }
 
-# STATIC_ROOT = os.path.join(BASE_DIR, 'front_ends/static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'front_ends/static')
