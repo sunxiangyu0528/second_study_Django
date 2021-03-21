@@ -11,10 +11,13 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
 import datetime
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+print(BASE_DIR)
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -36,12 +39,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'projects.apps.ProjectsConfig',
-    'interfaces.apps.InterfacesConfig',
-    'user.apps.UserConfig',
+    # 'apps.projects.apps.ProjectsConfig',
+    # 'apps.interfaces.apps.InterfacesConfig',
+    # 'apps.user.apps.UserConfig',
     'rest_framework',
     'django_filters',
     'drf_yasg',
+    'interfaces.apps.InterfacesConfig',
+    'projects.apps.ProjectsConfig',
+    'user.apps.UserConfig',
+    'configures.apps.ConfiguresConfig',
+    'debugtalks.apps.DebugtalksConfig',
+    'envs.apps.EnvsConfig',
+    'reports.apps.ReportsConfig',
+    'testcases.apps.TestcasesConfig',
+    'testsuits.apps.TestsuitsConfig',
+
 ]
 
 MIDDLEWARE = [
@@ -88,7 +101,7 @@ DATABASES = {
         # 指定引擎
         'ENGINE': 'django.db.backends.mysql',
         # 指定数据库名称
-        'NAME': 'sunxy2',
+        'NAME': 'study_happy',
         # 数据库用户
         'USER': 'root',
         # 数据库密码
@@ -96,7 +109,10 @@ DATABASES = {
         # 'HOST':'localhost',
         'HOST': '146.56.194.79',
 
-        'PORT': '3306'
+        'PORT': '3306',
+        # 'OPTIONS': {
+        #     "init_command": "SET foreign_key_checks = 0;",
+        # }
     }
 }
 
